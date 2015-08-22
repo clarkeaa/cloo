@@ -1,0 +1,27 @@
+﻿%{
+
+open Voidbred.Lisp
+%}
+
+%start parse
+
+%token <string> Identifier
+%token <string> Text
+%token <int> Digits
+%token Apostrophe LeftParen RightParen EOF
+
+%type <Voidbred.Lisp.LispVal list> parse
+
+%%
+
+
+Expr:
+| Identifier { Atom $1 }
+| Text { String $1 }
+| Digits { Number $1 }
+| LeftParen ExprList RightParen { $2 |> List.rev |> List }
+
+ExprList: Expr { [ $1 ] }
+| ExprList Expr { $2 :: $1  }
+
+parse: ExprList EOF { List.rev $1 }
